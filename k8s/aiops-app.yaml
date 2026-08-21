@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: aiops-app
-          image: host.docker.internal:5001/aiops-monitoring-system-aiops-app:latest
+          image: localhost:5001/aiops-monitoring-system-aiops-app:latest
           imagePullPolicy: Always
           ports:
             - containerPort: 8000

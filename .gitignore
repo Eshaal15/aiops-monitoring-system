@@ -38,3 +38,9 @@ htmlcov/
 # OS files
 .DS_Store
 Thumbs.db
+
+# Local training environment
+.venv-train/
+
+# Local Docker image archive
+aiops-app.tar
