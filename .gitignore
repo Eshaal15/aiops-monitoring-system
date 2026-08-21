@@ -21,6 +21,7 @@ data/processed/*
 
 # Generated ML models
 models/*
+!models/lstm_incident_predictor.onnx
 
 # Logs
 *.log
