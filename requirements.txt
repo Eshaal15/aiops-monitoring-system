@@ -4,3 +4,4 @@ scikit-learn
 matplotlib
 onnxruntime
 prometheus-client
+kubernetes
