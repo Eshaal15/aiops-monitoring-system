@@ -1,6 +1,6 @@
 import pandas as pd
 import numpy as np
-from tensorflow.keras.models import load_model
+import onnxruntime as ort
 from sklearn.preprocessing import MinMaxScaler
 
 
@@ -18,15 +18,17 @@ SEQUENCE_LENGTH = 20
 def calculate_incident_risk(
     metrics_path="data/raw/metrics.csv",
     anomalies_path="data/processed/anomalies.csv",
-    model_path="models/lstm_incident_predictor.keras",
+    model_path="models/lstm_incident_predictor.onnx",
     output_path="data/processed/incident_risk.csv",
 ):
     # Load metric data and anomaly results.
     metrics = pd.read_csv(metrics_path)
     anomalies = pd.read_csv(anomalies_path)
 
-    # Load the trained LSTM.
-    model = load_model(model_path)
+    # Load the ONNX LSTM model.
+    session = ort.InferenceSession(model_path)
+
+    input_name = session.get_inputs()[0].name
 
     values = metrics[FEATURES].values
 
@@ -39,9 +41,13 @@ def calculate_incident_risk(
     for i in range(SEQUENCE_LENGTH, len(scaled)):
         X.append(scaled[i - SEQUENCE_LENGTH:i])
 
-    X = np.array(X)
+    X = np.array(X, dtype=np.float32)
 
-    predictions = model.predict(X, verbose=0)
+    # Run ONNX inference.
+    predictions = session.run(
+        None,
+        {input_name: X},
+    )[0]
 
     # Prediction error indicates how unexpected the next observation is.
     actual = scaled[SEQUENCE_LENGTH:]
@@ -51,7 +57,7 @@ def calculate_incident_risk(
         axis=1,
     )
 
-    # Normalize prediction error to 0–1.
+    # Normalize prediction error to 0-1.
     error_min = prediction_error.min()
     error_max = prediction_error.max()
 
