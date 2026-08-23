@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
-import onnxruntime as ort
 from sklearn.preprocessing import MinMaxScaler
+from tensorflow.keras.models import load_model
 
 
 FEATURES = [
@@ -18,17 +18,15 @@ SEQUENCE_LENGTH = 20
 def calculate_incident_risk(
     metrics_path="data/raw/metrics.csv",
     anomalies_path="data/processed/anomalies.csv",
-    model_path="models/lstm_incident_predictor.onnx",
+    model_path="models/lstm_incident_predictor.keras",
     output_path="data/processed/incident_risk.csv",
 ):
     # Load metric data and anomaly results.
     metrics = pd.read_csv(metrics_path)
     anomalies = pd.read_csv(anomalies_path)
 
-    # Load the ONNX LSTM model.
-    session = ort.InferenceSession(model_path)
-
-    input_name = session.get_inputs()[0].name
+    # Load the trained LSTM model.
+    model = load_model(model_path)
 
     values = metrics[FEATURES].values
 
@@ -43,11 +41,8 @@ def calculate_incident_risk(
 
     X = np.array(X, dtype=np.float32)
 
-    # Run ONNX inference.
-    predictions = session.run(
-        None,
-        {input_name: X},
-    )[0]
+    # Run LSTM inference.
+    predictions = model.predict(X, verbose=0)
 
     # Prediction error indicates how unexpected the next observation is.
     actual = scaled[SEQUENCE_LENGTH:]
@@ -74,7 +69,7 @@ def calculate_incident_risk(
         SEQUENCE_LENGTH:
     ].astype(float).values
 
-    # Combine the two signals.
+    # Combine anomaly detection and LSTM prediction signals.
     risk_score = (
         0.6 * anomaly_signal
         + 0.4 * prediction_risk
