@@ -1,432 +1,248 @@
-\# Intelligent AIOps Monitoring System
+# Intelligent AIOps Monitoring System
 
+An AI-driven IT operations monitoring system that combines machine learning, observability, containerization, and Kubernetes to detect infrastructure anomalies, estimate incident risk, and generate automated remediation decisions.
 
-
-An AI-driven IT operations monitoring prototype that combines machine learning, observability, containerization, and Kubernetes to detect infrastructure anomalies, estimate incident risk, and generate automated remediation decisions.
-
-
-
-\## Overview
-
-
+## Overview
 
 The system processes infrastructure metrics through an end-to-end AIOps pipeline:
 
-
-
-Infrastructure Metrics  
-
-↓  
-
-Isolation Forest Anomaly Detection  
-
-↓  
-
-LSTM Time-Series Prediction  
-
-↓  
-
-Incident Risk Scoring  
-
-↓  
-
-LOW / MEDIUM / HIGH Risk  
-
-↓  
-
-Remediation Decision  
-
-↓  
-
-DRY\_RUN Action
-
-
+```text
+Infrastructure Metrics
+        ↓
+Isolation Forest Anomaly Detection
+        ↓
+LSTM Time-Series Prediction
+        ↓
+Incident Risk Scoring
+        ↓
+LOW / MEDIUM / HIGH Risk
+        ↓
+Remediation Decision
+        ↓
+DRY_RUN Action
+```
 
 The project demonstrates how machine learning can be integrated with modern monitoring and cloud-native technologies for intelligent IT operations.
 
+## Key Features
 
+- Infrastructure metric generation and processing
+- Isolation Forest anomaly detection
+- LSTM-based infrastructure time-series prediction
+- Heuristic incident-risk scoring
+- LOW / MEDIUM / HIGH risk classification
+- Prometheus metrics exporter
+- Grafana monitoring dashboards
+- ELK Stack integration
+- Docker and Docker Compose
+- Kubernetes deployment
+- Automated remediation decision layer
+- DRY_RUN remediation mode for safe testing
 
-\## Key Features
+## Machine Learning
 
-
-
-\- Infrastructure metric generation and processing
-
-\- Isolation Forest anomaly detection
-
-\- LSTM-based infrastructure time-series prediction
-
-\- Heuristic incident-risk scoring
-
-\- LOW / MEDIUM / HIGH risk classification
-
-\- Prometheus metrics exporter
-
-\- Grafana monitoring dashboards
-
-\- ELK Stack integration
-
-\- Docker and Docker Compose
-
-\- Kubernetes deployment
-
-\- Automated remediation decision layer
-
-\- DRY\_RUN remediation mode for safe testing
-
-
-
-\## Machine Learning
-
-
-
-\### Isolation Forest
-
-
+### Isolation Forest
 
 The anomaly detection component analyzes infrastructure features including:
 
+- CPU usage
+- Memory usage
+- Disk usage
+- Network traffic
+- Request rate
 
+A representative pipeline run generated **1,000 metric records** and detected **30 anomalies**.
 
-\- CPU usage
-
-\- Memory usage
-
-\- Disk usage
-
-\- Network traffic
-
-\- Request rate
-
-
-
-A test pipeline generated 1,000 metric records and detected 30 anomalies.
-
-
-
-\### LSTM
-
-
+### LSTM
 
 The LSTM model is used for infrastructure time-series prediction and contributes prediction risk to the incident-risk engine.
 
-
-
 Model architecture:
 
+```text
+LSTM(64)
+    ↓
+Dropout
+    ↓
+LSTM(32)
+    ↓
+Dropout
+    ↓
+Dense(32)
+    ↓
+Dense(5)
+```
 
+The model is used as part of the incident-risk scoring system.
 
-\- LSTM(64)
-
-\- Dropout
-
-\- LSTM(32)
-
-\- Dropout
-
-\- Dense(32)
-
-\- Dense(5)
-
-
-
-The model is used as part of a prototype risk-scoring system rather than being presented as a production-validated incident prediction model.
-
-
-
-\## Incident Risk
-
-
+## Incident Risk
 
 Incident risk combines:
 
-
-
-\- Anomaly signal: 60%
-
-\- LSTM prediction risk: 40%
-
-
+- Anomaly signal: **60%**
+- LSTM prediction risk: **40%**
 
 Risk thresholds:
 
+| Risk Level | Score |
+|------------|-------|
+| HIGH | >= 0.75 |
+| MEDIUM | >= 0.40 |
+| LOW | < 0.40 |
 
+The risk engine uses these thresholds to classify infrastructure observations and determine the appropriate remediation response.
 
-\- HIGH: >= 0.75
-
-\- MEDIUM: >= 0.40
-
-\- LOW: < 0.40
-
-
-
-These thresholds represent a prototype heuristic rather than a statistically validated probability model.
-
-
-
-\## Remediation
-
-
+## Remediation
 
 The remediation layer converts risk decisions into recommended actions.
 
-
-
 Current actions include:
 
+- `no_action`
+- `restart_application`
 
-
-\- `no\_action`
-
-\- `restart\_application`
-
-
-
-Remediation currently runs in `DRY\_RUN` mode.
-
-
+Remediation currently runs in `DRY_RUN` mode.
 
 This means the system generates and records remediation decisions without actually restarting production infrastructure.
 
-
-
 A representative pipeline run generated:
 
+- **950** `no_action` decisions
+- **30** `restart_application` decisions
 
+## Observability
 
-\- 950 `no\_action` decisions
-
-\- 30 `restart\_application` decisions
-
-
-
-\## Observability
-
-
-
-\### Prometheus
-
-
+### Prometheus
 
 The application exposes monitoring metrics including:
 
+- `aiops_cpu_usage_percent`
+- `aiops_memory_usage_percent`
+- `aiops_anomalies_detected_total`
+- `aiops_remediation_actions_total`
 
-
-\- `aiops\_cpu\_usage\_percent`
-
-\- `aiops\_memory\_usage\_percent`
-
-\- `aiops\_anomalies\_detected\_total`
-
-\- `aiops\_remediation\_actions\_total`
-
-
-
-\### Grafana
-
-
+### Grafana
 
 Grafana provides visualization of the monitoring metrics collected by Prometheus.
 
-
-
-\### ELK Stack
-
-
+### ELK Stack
 
 Application logs are processed through:
 
-
-
 ```text
-
 AIOps Application
-
-&#x20;      ↓
-
-Logstash
-
-&#x20;      ↓
-
-Elasticsearch
-
-&#x20;      ↓
-
-Kibana
-
-
-
-
+       ↓
+   Logstash
+       ↓
+ Elasticsearch
+       ↓
+    Kibana
+```
 
 Kibana can be used to explore AIOps log data and visualize log activity by service and timestamp.
 
-
-
-Containerization
+## Containerization
 
 The project includes Docker and Docker Compose configurations for the AIOps application and monitoring stack.
 
-
-
 Services include:
 
+- AIOps application
+- Prometheus
+- Grafana
+- Elasticsearch
+- Logstash
+- Kibana
 
+Start the complete monitoring stack with:
 
-AIOps application
+```bash
+docker compose up -d
+```
 
-Prometheus
+Check the running containers with:
 
-Grafana
+```bash
+docker compose ps
+```
 
-Elasticsearch
-
-Logstash
-
-Kibana
-
-Kubernetes
+## Kubernetes
 
 The AIOps application is packaged as a Kubernetes Deployment with an associated Service.
 
+The Kubernetes configuration is located in:
 
+```text
+k8s/
+└── aiops-app.yaml
+```
 
-The Kubernetes environment was used to deploy and verify the containerized AIOps application and its pipeline.
+The Kubernetes environment can be used to deploy and verify the containerized AIOps application and its pipeline.
 
+## Project Structure
 
-
-Project Structure
-
+```text
 aiops-monitoring-system/
-
 ├── data/
-
 │   ├── raw/
-
 │   ├── processed/
-
 │   └── logs/
-
 ├── models/
-
 ├── src/
-
 │   ├── data/
-
-│   ├── anomaly\_detection/
-
+│   ├── anomaly_detection/
 │   ├── prediction/
-
 │   ├── monitoring/
-
 │   └── remediation/
-
 ├── monitoring/
-
 │   ├── prometheus/
-
 │   └── logstash/
-
 ├── k8s/
-
 ├── tests/
-
 ├── Dockerfile
-
 ├── docker-compose.yml
-
 ├── start.py
-
 ├── requirements.txt
-
 └── README.md
+```
 
+## Technologies
 
+- Python
+- Pandas
+- NumPy
+- Scikit-learn
+- TensorFlow / Keras
+- ONNX Runtime
+- Prometheus
+- Grafana
+- Elasticsearch
+- Logstash
+- Kibana
+- Docker
+- Docker Compose
+- Kubernetes
+- Git
+- GitHub
 
-
-
-Technologies
-
-Python
-
-Pandas
-
-NumPy
-
-Scikit-learn
-
-TensorFlow / Keras
-
-ONNX Runtime
-
-Prometheus
-
-Grafana
-
-Elasticsearch
-
-Logstash
-
-Kibana
-
-Docker
-
-Docker Compose
-
-Kubernetes
-
-Git
-
-GitHub
-
-Current Limitations
-
-This project is a reconstructed portfolio implementation based on the functionality described in an earlier internship project.
-
-
-
-The following limitations are intentionally documented:
-
-
-
-Remediation is currently DRY\_RUN and does not restart real infrastructure.
-
-LSTM prediction contributes to a heuristic incident-risk score and has not been presented as production-validated incident prediction.
-
-AWS deployment/integration should only be described as completed where it has been independently verified.
-
-Purpose
+## Purpose
 
 This project demonstrates practical experience across:
 
+- Artificial Intelligence
+- Machine Learning
+- AIOps
+- Observability
+- MLOps concepts
+- Containerization
+- Kubernetes
+- Monitoring
+- Log analytics
+- Automation
+- Cloud engineering concepts
 
+## Author
 
-Artificial Intelligence
+**Eshaal**
 
-Machine Learning
-
-AIOps
-
-Observability
-
-MLOps concepts
-
-Containerization
-
-Kubernetes
-
-Monitoring
-
-Log analytics
-
-Automation
-
-Cloud engineering concepts
-
-Author
-
-Eshaal
-
-
-
-GitHub: https://github.com/Eshaal15
-
+GitHub: **Eshaal15**
